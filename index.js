@@ -7,20 +7,17 @@ if (typeof module !== 'undefined') {
 		Handlebars = require("handlebars");
 }
 
-if (!L.Icon.Default.imagePath) {
-	L.Icon.Default.imagePath = "http://cdn.leafletjs.com/leaflet-0.6.4/images";
-}
-
 L.Brochure = L.Class.extend({
 	options: {
-		fitFeatures: true
+		fitFeatures: true,
+		mapOptions: {}
 	},
 
 	initialize: function(id, options) {
 		var _this = this;
 
 		function initMap(tileJson) {
-			_this.map = L.TileJSON.createMap(id, tileJson, options);
+			_this.map = L.TileJSON.createMap(id, tileJson, _this.options.mapOptions);
 			_this._createGeoJson()
 			if (options.onMapCreated) {
 				options.onMapCreated(_this.map);
@@ -31,6 +28,7 @@ L.Brochure = L.Class.extend({
 		this.popupTemplate = options.popupTemplate ? 
 			Handlebars.compile(options.popupTemplate) 
 			: null;
+		this.features = {};
 
 		if (options.tileJson) {
 			initMap(options.tileJson);
@@ -51,6 +49,10 @@ L.Brochure = L.Class.extend({
 		if (this.popupTemplate) {
 			layer.bindPopup(this.popupTemplate(geojson));
 		}
+		if (this.options.featureIndexer) {
+			var index = this.options.featureIndexer(geojson);
+			this.features[index] = layer;
+		}
 	},
 
 	_createGeoJson: function() {
@@ -66,6 +68,13 @@ L.Brochure = L.Class.extend({
 
 			if (_this.options.fitFeatures) {
 				_this.map.fitBounds(geoJson.getBounds());
+			}
+
+			if (_this.options.markFeature) {
+				var layer = _this.features[_this.options.markFeature];
+				if (layer) {
+					layer.openPopup();
+				}
 			}
 		}
 
