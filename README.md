@@ -4,6 +4,8 @@ Brochure
 Brochure is a tiny library to create maps using [TileJSON](https://github.com/perliedman/TileJSON/tree/master/2.0.0) and [GeoJson](http://geojson.org/) with minimal coding effort. Essentially a
 [Leaflet](http://leafletjs.com/) and [leaflet-tilejson](https://github.com/kartena/leaflet-tilejson) wrapper.
 
+See the small [Brochure demo](http://perliedman.github.com/brochure/)!
+
 Usage
 -----
 
