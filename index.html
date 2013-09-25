@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Brochure Demo</title>
+	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css" />
+	<!--[if lte IE 8]>
+	    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.ie.css" />
+	<![endif]-->
+</head>
+<body>
+	<div id="map" style="position: fixed; width: 100%; height: 100%;"></div>
+	<script src="brochure-bundle.js"></script>
+	<script type="text/javascript">
+		var brochure = new L.Brochure("map", {
+			tileJsonUrl: "http://api.geosition.com/tile-meta/osm-bright-3006.jsonp",
+			geoJsonUrl: "http://content.kartena.se/viewer/GeoJson/MapItem/?all=1&cid=71",
+			popupTemplate:
+				"<h2>{{properties.Name}}</h2>" +
+				"<h3>Adress</h3>" +
+				"{{properties.Attributes.Adress.Value}}<br/>" + 
+				"{{properties.Attributes.Postnr.Value}} {{properties.Attributes.Postort.Value}}"
+		});
+	</script>
+</body>
+</html>
