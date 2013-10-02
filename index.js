@@ -11,6 +11,10 @@ if (!L.Icon.Default.imagePath) {
 	L.Icon.Default.imagePath = "http://cdn.leafletjs.com/leaflet-0.6.4/images"
 }
 
+function isString(o) {
+	return typeof o == 'string' || o instanceof String;
+}
+
 L.Brochure = L.Class.extend({
 	options: {
 		fitFeatures: true,
@@ -26,16 +30,21 @@ L.Brochure = L.Class.extend({
 				onEachFeature: function(geoJson, layer) { _this._onEachFeature(geoJson,layer); }
 			}).addTo(_this.map);
 
-			_this.options.geoJson ? _this.addGeoJson(_this.options.geoJson) : 0;
-			_this.options.geoJsonUrl ? _this.loadGeoJson(_this.options.geoJsonUrl)
-				.always(function() {
-					if (_this.options.fitFeatures) {
-						_this.map.fitBounds(_this.geoJsonLayer.getBounds());
-					}
-					if (_this.options.markFeature) {
-						_this.markFeature(_this.options.markFeature);
-					}
-				}) : 0;
+			if (_this.options.geoJson) {
+				if (isString(_this.options.geoJson) || _this.options.geoJson.url) {
+					_this.loadGeoJson(_this.options.geoJson)
+						.always(function() {
+							if (_this.options.fitFeatures) {
+								_this.map.fitBounds(_this.geoJsonLayer.getBounds());
+							}
+							if (_this.options.markFeature) {
+								_this.markFeature(_this.options.markFeature);
+							}
+						});
+				} else {
+					_this.addGeoJson(_this.options.geoJson);
+				}
+			}
 
 			if (options.onMapCreated) {
 				options.onMapCreated(_this.map);
@@ -56,10 +65,10 @@ L.Brochure = L.Class.extend({
 				type: "jsonp",
 				jsonpCallback: 'jsonp',
 				jsonpCallbackName: 'callback',
-  				success: function(resp) {
+				success: function(resp) {
 					initMap(resp);
 				}
-			})
+			});
 		}
 	},
 
@@ -77,14 +86,20 @@ L.Brochure = L.Class.extend({
 		this.geoJsonLayer.addData(geojson);
 	},
 
-	loadGeoJson: function(url) {
-		var _this = this;
-		return reqwest({
-			url: url,
-			type: "jsonp",
-			success: function(resp) {
-				_this.addGeoJson(resp);
-			}
+	loadGeoJson: function(o) {
+		var _this = this,
+			params = o;
+
+		if (isString(params)) {
+			params = {
+				url: params,
+				type: "json",
+				crossOrigin: true
+			};
+		}
+
+		return reqwest(params).then(function(resp) {
+			_this.addGeoJson(resp);
 		});
 	},
 
