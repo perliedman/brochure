@@ -7,6 +7,10 @@ if (typeof module !== 'undefined') {
 		Handlebars = require("handlebars");
 }
 
+if (!L.Icon.Default.imagePath) {
+	L.Icon.Default.imagePath = "http://cdn.leafletjs.com/leaflet-0.6.4/images"
+}
+
 L.Brochure = L.Class.extend({
 	options: {
 		fitFeatures: true,
@@ -18,7 +22,21 @@ L.Brochure = L.Class.extend({
 
 		function initMap(tileJson) {
 			_this.map = L.TileJSON.createMap(id, tileJson, _this.options.mapOptions);
-			_this._createGeoJson()
+			_this.geoJsonLayer = L.geoJson(null, {
+				onEachFeature: function(geoJson, layer) { _this._onEachFeature(geoJson,layer); }
+			}).addTo(_this.map);
+
+			_this.options.geoJson ? _this.addGeoJson(_this.options.geoJson) : 0;
+			_this.options.geoJsonUrl ? _this.loadGeoJson(_this.options.geoJsonUrl)
+				.always(function() {
+					if (_this.options.fitFeatures) {
+						_this.map.fitBounds(_this.geoJsonLayer.getBounds());
+					}
+					if (_this.options.markFeature) {
+						_this.markFeature(_this.options.markFeature);
+					}
+				}) : 0;
+
 			if (options.onMapCreated) {
 				options.onMapCreated(_this.map);
 			}
@@ -55,41 +73,25 @@ L.Brochure = L.Class.extend({
 		}
 	},
 
-	_createGeoJson: function() {
-		var _this = this,
-			geoJson = L.geoJson(null, {
-				onEachFeature: function(geoJson, layer) { _this._onEachFeature(geoJson,layer); }
-			});
+	addGeoJson: function(geojson) {
+		this.geoJsonLayer.addData(geojson);
+	},
 
-		function initGeoJson(data) {
-			geoJson
-				.addData(data)
-				.addTo(_this.map);
-
-			if (_this.options.fitFeatures) {
-				_this.map.fitBounds(geoJson.getBounds());
+	loadGeoJson: function(url) {
+		var _this = this;
+		return reqwest({
+			url: url,
+			type: "jsonp",
+			success: function(resp) {
+				_this.addGeoJson(resp);
 			}
+		});
+	},
 
-			if (_this.options.markFeature) {
-				var layer = _this.features[_this.options.markFeature];
-				if (layer) {
-					layer.openPopup();
-				}
-			}
-		}
-
-		if (this.options.geoJson) {
-			initGeoJson(this.options.geoJson);
-		}
-
-		if (this.options.geoJsonUrl) {
-			reqwest({
-				url: this.options.geoJsonUrl,
-				type: "jsonp",
-  				success: function(resp) {
-					initGeoJson(resp);
-				}
-			})
+	markFeature: function(id) {
+		if (this.features[id]) {
+			this.features[id].openPopup();
 		}
 	}
-})
+});
+
