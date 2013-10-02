@@ -2,12 +2,12 @@ var L = require("leaflet"),
 	Brochure = require("../");
 
 var brochure = new L.Brochure("map", {
-	tileJsonUrl: "http://api.geosition.com/tile-meta/lm.jsonp",
-	geoJsonUrl: "http://content.kartena.se/viewer/GeoJson/MapItem/?all=1&cid=70&category=160",
+	tileJsonUrl: "http://api.geosition.com/tile-meta/osm-bright-3006.jsonp",
+	geoJson: "map.geojson",
 	popupTemplate:
-		"<h2>{{properties.Name}}</h2>" +
-		"<h3>Adress</h3>" +
-		"{{properties.Attributes.Adress.Value}}<br/>" + 
-		"{{properties.Attributes.Postnr.Value}} {{properties.Attributes.Postort.Value}}" +
-		"<p><em>Antal platser:</em> {{properties.Attributes.Antal platser.Value}}"
+		"<h2>{{properties.name}}</h2>" +
+		"<p>{{properties.desc}}</p>"
 });
+
+// to ease debugging
+window.brochure = brochure;
