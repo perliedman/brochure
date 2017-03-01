@@ -1,6 +1,8 @@
 Brochure
 ========
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/perliedman/brochure.svg)](https://greenkeeper.io/)
+
 Brochure is a tiny library to create maps using [TileJSON](https://github.com/perliedman/TileJSON/tree/master/2.0.0) and [GeoJson](http://geojson.org/) with minimal coding effort. Essentially a
 [Leaflet](http://leafletjs.com/) and [leaflet-tilejson](https://github.com/kartena/leaflet-tilejson) wrapper.
 
